@@ -1,20 +1,22 @@
 package main
 
 import (
-	"DriferTelementary/internal/routes"
+	"fmt"
 	"log"
 	"net/http"
 )
 
-// --- Main ---
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w,"hello world")
+}
 
 func main() {
 
-	router := routes.NewRouter()
+	http.HandleFunc("/", rootHandler)
 
 	addr := ":8080"
 	log.Printf("Server listening on %s", addr)
-	if err := http.ListenAndServe(addr, router); err != nil {
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
