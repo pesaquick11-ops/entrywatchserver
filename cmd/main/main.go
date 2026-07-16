@@ -2,15 +2,13 @@ package main
 
 import (
 	"entrywatchserver/internal/db"
-	"fmt"
+	"entrywatchserver/internal/handlers"
+	"entrywatchserver/internal/repository"
+	"entrywatchserver/internal/router"
 	"log"
 	"net/http"
-	"time"
 )
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w,"hello world")
-}
 
 func main() {
 
@@ -21,14 +19,15 @@ func main() {
 	}
 
 	database := mongoClient.Database("test")
-	
 
+	userRepo := repository.NewUserRepository(database)
+	userHandler := handlers.NewUserHandler(userRepo)
 
-	http.HandleFunc("/", rootHandler)
+	r := router.New(userHandler)
 
 	addr := ":8080"
 	log.Printf("Server listening on %s", addr)
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatal(err)
 	}
 }
