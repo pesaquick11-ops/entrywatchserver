@@ -7,12 +7,22 @@ import (
 	"entrywatchserver/internal/router"
 	"log"
 	"net/http"
-)
+	"os"
 
+	"github.com/joho/godotenv"
+)
 
 func main() {
 
-	mongoClient,err := db.ConnectToMongo("mongodb://localhost:27017")
+	_ = godotenv.Load()
+
+	mongoURI := os.Getenv("MONGO_URI")
+
+	if mongoURI == "" {
+		log.Fatal("Mongo DB URI is not set")
+	}
+
+	mongoClient, err := db.ConnectToMongo(mongoURI)
 
 	if err != nil {
 		log.Fatal(err)
@@ -25,7 +35,12 @@ func main() {
 
 	r := router.New(userHandler)
 
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5050"
+	}
+	addr := ":" + port
+
 	log.Printf("Server listening on %s", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatal(err)
