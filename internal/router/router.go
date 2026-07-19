@@ -6,7 +6,8 @@ import (
 )
 
 type Handlers struct {
-	User *handlers.UserHandler
+	User  *handlers.UserHandler
+	Athan *handlers.AttendanceHandler
 }
 
 func New(h Handlers) http.Handler {
@@ -15,6 +16,7 @@ func New(h Handlers) http.Handler {
 	mux.HandleFunc("GET /", rootHandler)
 	mux.HandleFunc("GET /users", h.User.GetAll)
 	mux.HandleFunc("POST /users/new", h.User.AddUser)
+	mux.HandleFunc("POST /record/new", h.Athan.RecordScan)
 
 	return mux
 }
