@@ -10,7 +10,16 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
+
+func setupHandlers(database *mongo.Database) router.Handlers {
+	userRepo := repository.NewUserRepository(database)
+
+	return router.Handlers{
+		User: handlers.NewUserHandler(userRepo),
+	}
+}
 
 func main() {
 
@@ -28,12 +37,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	database := mongoClient.Database("test")
+	dbName := os.Getenv("DATABASE_NAME")
 
-	userRepo := repository.NewUserRepository(database)
-	userHandler := handlers.NewUserHandler(userRepo)
+	database := mongoClient.Database(dbName)
 
-	r := router.New(userHandler)
+	h := setupHandlers(database)
+	r := router.New(h)
 
 	port := os.Getenv("PORT")
 	if port == "" {

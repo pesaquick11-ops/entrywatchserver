@@ -1,16 +1,20 @@
 package router
 
 import (
-	"net/http"
 	"entrywatchserver/internal/handlers"
+	"net/http"
 )
 
-func New(userHandler *handlers.UserHandler) http.Handler {
+type Handlers struct {
+	User *handlers.UserHandler
+}
+
+func New(h Handlers) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /", rootHandler)
-	mux.HandleFunc("GET /users", userHandler.GetAll)
-	// mux.HandleFunc("GET /products", productHandler.GetAll)
+	mux.HandleFunc("GET /users", h.User.GetAll)
+	mux.HandleFunc("POST /users/new", h.User.AddUser)
 
 	return mux
 }
