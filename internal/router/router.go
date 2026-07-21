@@ -16,7 +16,8 @@ func New(h Handlers) http.Handler {
 	mux.HandleFunc("GET /", rootHandler)
 	mux.HandleFunc("GET /users", h.User.GetAll)
 	mux.HandleFunc("POST /users/new", h.User.AddUser)
-	mux.HandleFunc("POST /record/new", h.Athan.RecordScan)
+	mux.HandleFunc("GET /records", h.Athan.GetAll)
+	mux.HandleFunc("POST /records/new", h.Athan.RecordScan)
 
 	return mux
 }

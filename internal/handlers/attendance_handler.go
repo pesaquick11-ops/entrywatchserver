@@ -17,6 +17,22 @@ func NewAttendanceHandler(attRepo *repository.AttendanceRepository) *AttendanceH
 	return &AttendanceHandler{repo: attRepo}
 }
 
+func (a *AttendanceHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+
+	attendances, err := a.repo.FindAll(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(attendances)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}
+
 func (a *AttendanceHandler) RecordScan(w http.ResponseWriter, r *http.Request) {
 	var attRecord models.Attendance
 
