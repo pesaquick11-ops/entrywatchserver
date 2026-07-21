@@ -15,9 +15,10 @@ import (
 
 func setupHandlers(database *mongo.Database) router.Handlers {
 	userRepo := repository.NewUserRepository(database)
-
+	attRepo := repository.NewAttendanceRepository(database)
 	return router.Handlers{
-		User: handlers.NewUserHandler(userRepo),
+		User:  handlers.NewUserHandler(userRepo),
+		Athan: handlers.NewAttendanceHandler(attRepo),
 	}
 }
 
