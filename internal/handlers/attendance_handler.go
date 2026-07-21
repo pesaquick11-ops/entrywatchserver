@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"entrywatchserver/internal/models"
 	"entrywatchserver/internal/repository"
 )
 
@@ -33,28 +32,32 @@ func (a *AttendanceHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type ScanRequest struct {
+	Username   string `json:"username"`
+	Confidence string `json:"confidence"`
+}
+
 func (a *AttendanceHandler) RecordScan(w http.ResponseWriter, r *http.Request) {
-	var attRecord models.Attendance
-
-	err := json.NewDecoder(r.Body).Decode(&attRecord)
-
+	var req ScanRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "invalid request body ", http.StatusBadRequest)
 		return
 	}
-
-	if attRecord.Username == "" {
+	if req.Username == "" {
 		http.Error(w, "Username is not provided", http.StatusBadRequest)
 		return
 	}
-
-	err = a.repo.RecordScan(r.Context(), attRecord.Username, time.Now())
-
+	if req.Confidence == "" {
+		http.Error(w, "Confidence is not provided", http.StatusBadRequest)
+		return
+	}
+	err = a.repo.RecordScan(r.Context(), req.Username, req.Confidence, time.Now())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"timestamp": "added"})
-
 }
